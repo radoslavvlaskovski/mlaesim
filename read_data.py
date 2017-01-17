@@ -27,5 +27,4 @@ def plot_measurements():
     plt.plot(errors.T[0], errors.T[1])
     plt.show()
 
-
 plot_measurements()
