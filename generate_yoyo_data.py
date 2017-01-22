@@ -18,5 +18,3 @@ def plot_data():
     plt.plot(np.arange(600), yoyo_data)
     plt.show()
 
-
-plot_data()
