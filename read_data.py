@@ -3,7 +3,7 @@ from pprint import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-weird_name = ["elasticapp-19291764"]
+weird_file = ["elasticapp-19291764"]
 filenames = ["elasticapp-33707438", "elasticapp-46926644", "elasticapp-54363890",
              "elasticapp-61489080", "elasticapp-70576956", "elasticapp-79702942", "elasticapp-87181135", "elasticapp-94268427",
              "elasticapp-23246583", "elasticapp-33971639", "elasticapp-46957027", "elasticapp-55401853", "elasticapp-64146112",
@@ -26,8 +26,8 @@ def read_ase_measurements_requests():
 def read_ase_measurements_errors():
 
     errors = pandas.read_csv("resources/haproxy-78877094-errors.csv", sep=";")
-    errors = np.array(errors)
-    errors = np.delete(errors, (0), axis=1)
+    #errors = np.array(errors)
+    #errors = np.delete(errors, (0), axis=1)
     return errors
 
 def read_metrics():
@@ -37,28 +37,63 @@ def read_metrics():
         alloc_all.append(pandas.read_csv("resources/cpu_allocation/" + file_name + ".dat", sep=" "))
     return alloc_all
 
-def create_data_points():
+def create_mean_cpu():
 
     metrics = read_metrics()
-    requests = read_ase_measurements_requests()
-    count = 0
 
-    for i in range(0, 600):
-        timestamp = requests["timestamp"][i]
+    timestamp_max = 0
+    timestamp_min = 1500000000
+    for vm in metrics:
+        max_t = vm["timestamp"][len(vm) - 1]
+        min_t = vm["timestamp"][0]
+
+        if max_t > timestamp_max:
+            timestamp_max = max_t
+        if min_t < timestamp_min:
+            timestamp_min = min_t
+
+    num_vms = list()
+    for i in range(timestamp_min, timestamp_max, 6):
+        count = 0
+        cpu = 0
         for vm in metrics:
-            for t_vm in vm["timestamp"]:
-               if t_vm == timestamp:
-                   count += 1
-    print count
+            vm_start = vm["timestamp"][0]
+            vm_end = vm["timestamp"][len(vm) - 1]
+            if vm_start <= i <= vm_end:
+                count +=1
+                for j in range(0, len(vm) -1):
+                    cur_t = vm["timestamp"][j]
+                    if cur_t > i:
+                        cpu += vm["value"][j]
+                        break
+
+        num_vms.append([i, int(cpu / count)])
+
+    pprint(pandas.DataFrame(num_vms).to_csv("resources/cpu_mean.csv"))
+
+def read_cpu_mean():
+    cpu_mean = pandas.read_csv("resources/cpu_mean.csv", sep=",")
+    return cpu_mean
+
 
 def plot_measurements():
 
     requests = read_ase_measurements_requests()
+    requests = np.array(requests)
+    requests = np.delete(requests, (0), axis=1)
     errors = read_ase_measurements_errors()
+    errors = np.array(errors)
+    errors = np.delete(errors, (0), axis=1)
+    cpu_mean = read_cpu_mean()
+    cpu_mean = np.array(cpu_mean)
+    cpu_mean = np.delete(cpu_mean, (0), axis=1)
+
     plt.subplot(211)
     plt.plot(requests.T[0], requests.T[1])
     plt.subplot(212)
-    plt.plot(errors.T[0], errors.T[1])
+    plt.xlabel("Timestamp")
+    plt.ylabel("CPU %")
+    plt.plot(np.ones(len(cpu_mean.T[0])), cpu_mean.T[1])
     plt.show()
 
-create_data_points()
+plot_measurements()
