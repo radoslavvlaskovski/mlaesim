@@ -67,7 +67,7 @@ def create_mean_cpu():
                         cpu += vm["value"][j]
                         break
 
-        num_vms.append([i, int(cpu / count)])
+        num_vms.append([i, int(cpu / count), count])
 
     pprint(pandas.DataFrame(num_vms).to_csv("resources/cpu_mean.csv"))
 
@@ -75,25 +75,43 @@ def read_cpu_mean():
     cpu_mean = pandas.read_csv("resources/cpu_mean.csv", sep=",")
     return cpu_mean
 
+def requests_per_vm():
+
+    requests = read_ase_measurements_requests()
+    cpu_mean = read_cpu_mean()
+    requests_per_vm = list()
+
+    for j in range(0, len(requests["timestamp"])):
+        timestamp = requests["timestamp"][j]
+        value = requests["value"][j]
+        i = 0
+        while cpu_mean["timestamp"][i] < timestamp and len(cpu_mean) - 1 > i:
+            i +=1
+        requests_per_vm.append([timestamp, int(value / cpu_mean["count"][i])])
+
+    pprint(pandas.DataFrame(requests_per_vm).to_csv("resources/requests_mean.csv"))
+
+def read_req_mean():
+    req_mean = pandas.read_csv("resources/requests_mean.csv", sep=",")
+    return req_mean
 
 def plot_measurements():
 
-    requests = read_ase_measurements_requests()
-    requests = np.array(requests)
-    requests = np.delete(requests, (0), axis=1)
-    errors = read_ase_measurements_errors()
-    errors = np.array(errors)
-    errors = np.delete(errors, (0), axis=1)
+    req_mean = read_req_mean()
+    req_mean = np.array(req_mean)
+    req_mean = np.delete(req_mean, (0), axis=1)
     cpu_mean = read_cpu_mean()
     cpu_mean = np.array(cpu_mean)
     cpu_mean = np.delete(cpu_mean, (0), axis=1)
 
     plt.subplot(211)
-    plt.plot(requests.T[0], requests.T[1])
+    plt.xlabel("Timestamp")
+    plt.ylabel("Requests %")
+    plt.plot(req_mean.T[0], req_mean.T[1])
     plt.subplot(212)
     plt.xlabel("Timestamp")
     plt.ylabel("CPU %")
-    plt.plot(np.ones(len(cpu_mean.T[0])), cpu_mean.T[1])
+    plt.scatter(cpu_mean.T[0], cpu_mean.T[1], color="r")
     plt.show()
 
 plot_measurements()
