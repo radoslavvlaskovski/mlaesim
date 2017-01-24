@@ -98,20 +98,22 @@ def read_req_mean():
 def plot_measurements():
 
     req_mean = read_req_mean()
+    req_mean["timestamp"] = req_mean["timestamp"] - np.ones(len(req_mean))*1456100000
     req_mean = np.array(req_mean)
     req_mean = np.delete(req_mean, (0), axis=1)
     cpu_mean = read_cpu_mean()
+    cpu_mean["timestamp"] = cpu_mean["timestamp"] - np.ones(len(cpu_mean))*1456100000
     cpu_mean = np.array(cpu_mean)
     cpu_mean = np.delete(cpu_mean, (0), axis=1)
 
     plt.subplot(211)
     plt.xlabel("Timestamp")
-    plt.ylabel("Requests %")
+    plt.ylabel("Requests per VM")
     plt.plot(req_mean.T[0], req_mean.T[1])
     plt.subplot(212)
     plt.xlabel("Timestamp")
     plt.ylabel("CPU %")
-    plt.scatter(cpu_mean.T[0], cpu_mean.T[1], color="r")
+    plt.plot(cpu_mean.T[0], cpu_mean.T[1])
     plt.show()
 
 plot_measurements()
