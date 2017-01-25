@@ -3,6 +3,7 @@ from pprint import *
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.cluster as cluster
+from mpl_toolkits.mplot3d import Axes3D
 
 weird_file = ["elasticapp-19291764"]
 filenames = ["elasticapp-33707438", "elasticapp-46926644", "elasticapp-54363890",
@@ -77,13 +78,11 @@ def cpu_mean_compressed():
     cpu_mean = read_cpu_mean()
     compressed = list()
     for i in range(0, len(cpu_mean) - 11, 10):
-
         timestamp = cpu_mean["timestamp"][i]
         mean_load = 0
         for j in range(i, i + 9):
             mean_load += cpu_mean["value"][j]
-        compressed.append([timestamp, int(mean_load / 10)])
-
+        compressed.append([timestamp, int(mean_load / 10), cpu_mean["count"][i]])
     return np.array(compressed)
 
 
@@ -108,7 +107,6 @@ def read_req_mean():
     return req_mean
 
 def create_data_points():
-
     req_mean = read_req_mean()
     cpmc = cpu_mean_compressed()
     data_points = list()
@@ -116,10 +114,15 @@ def create_data_points():
         data_points.append([req_mean["value"][i], cpmc[i-1][1]])
     return np.array(data_points)
 
-
+def create_3d_data_points():
+    req_mean = read_req_mean()
+    cpmc = cpu_mean_compressed()
+    data_points = list()
+    for i in range(1, len(req_mean) - 1):
+        data_points.append([req_mean["value"][i], cpmc[i - 1][1], cpmc[i - 1][2]])
+    return np.array(data_points)
 
 def plot_measurements():
-
     req_mean = read_req_mean()
     req_mean["timestamp"] = req_mean["timestamp"] - np.ones(len(req_mean))*1456100000
     req_mean = np.array(req_mean)
@@ -206,7 +209,60 @@ def clustering_4():
     plt.scatter(class4.T[0], class4.T[1], color="r")
     plt.show()
 
-clustering_2()
-clustering_3()
-#clustering_4()
+def clustering_2_3d():
 
+    dp = create_3d_data_points()
+    kmeans = cluster.KMeans(n_clusters=2).fit_predict(dp)
+    class1 = list()
+    class2 = list()
+    for i in range(0, len(kmeans)):
+        if kmeans[i] == 0:
+            class1.append(dp[i])
+        if kmeans[i] == 1:
+            class2.append(dp[i])
+    class1 = np.array(class1)
+    class2 = np.array(class2)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(class1.T[0], class1.T[1], class1.T[2], color="b")
+    ax.scatter(class2.T[0], class2.T[1], class2.T[2], color="g")
+    plt.show()
+
+def clustering_3_3d():
+
+    dp = create_3d_data_points()
+    kmeans = cluster.KMeans(n_clusters=3).fit_predict(dp)
+    class1 = list()
+    class2 = list()
+    class3 = list()
+    for i in range(0, len(kmeans)):
+        if kmeans[i] == 0:
+            class1.append(dp[i])
+        if kmeans[i] == 1:
+            class2.append(dp[i])
+        if kmeans[i] == 2:
+            class3.append(dp[i])
+    class1 = np.array(class1)
+    class2 = np.array(class2)
+    class3 = np.array(class3)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(class1.T[0], class1.T[1], class1.T[2], color="b")
+    ax.scatter(class2.T[0], class2.T[1], class2.T[2], color="g")
+    ax.scatter(class3.T[0], class3.T[1], class3.T[2], color="r")
+    plt.show()
+
+
+def clustering_2d():
+    clustering_2()
+    clustering_3()
+    # clustering_4()
+
+
+def clustering_3d():
+    clustering_2_3d()
+    clustering_3_3d()
+
+clustering_3d()
