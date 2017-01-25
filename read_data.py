@@ -2,6 +2,7 @@ import pandas
 from pprint import *
 import numpy as np
 import matplotlib.pyplot as plt
+import sklearn.cluster as cluster
 
 weird_file = ["elasticapp-19291764"]
 filenames = ["elasticapp-33707438", "elasticapp-46926644", "elasticapp-54363890",
@@ -19,15 +20,11 @@ filenames = ["elasticapp-33707438", "elasticapp-46926644", "elasticapp-54363890"
 def read_ase_measurements_requests():
 
     requests = pandas.read_csv("resources/haproxy-78877094-requests.csv", sep=";")
-    #requests = np.array(requests)
-    #requests = np.delete(requests, (0), axis=1)
     return requests
 
 def read_ase_measurements_errors():
 
     errors = pandas.read_csv("resources/haproxy-78877094-errors.csv", sep=";")
-    #errors = np.array(errors)
-    #errors = np.delete(errors, (0), axis=1)
     return errors
 
 def read_metrics():
@@ -75,6 +72,21 @@ def read_cpu_mean():
     cpu_mean = pandas.read_csv("resources/cpu_mean.csv", sep=",")
     return cpu_mean
 
+def cpu_mean_compressed():
+
+    cpu_mean = read_cpu_mean()
+    compressed = list()
+    for i in range(0, len(cpu_mean) - 11, 10):
+
+        timestamp = cpu_mean["timestamp"][i]
+        mean_load = 0
+        for j in range(i, i + 9):
+            mean_load += cpu_mean["value"][j]
+        compressed.append([timestamp, int(mean_load / 10)])
+
+    return np.array(compressed)
+
+
 def requests_per_vm():
 
     requests = read_ase_measurements_requests()
@@ -95,6 +107,17 @@ def read_req_mean():
     req_mean = pandas.read_csv("resources/requests_mean.csv", sep=",")
     return req_mean
 
+def create_data_points():
+
+    req_mean = read_req_mean()
+    cpmc = cpu_mean_compressed()
+    data_points = list()
+    for i in range(1, len(req_mean) - 1):
+        data_points.append([req_mean["value"][i], cpmc[i-1][1]])
+    return np.array(data_points)
+
+
+
 def plot_measurements():
 
     req_mean = read_req_mean()
@@ -106,14 +129,84 @@ def plot_measurements():
     cpu_mean = np.array(cpu_mean)
     cpu_mean = np.delete(cpu_mean, (0), axis=1)
 
-    plt.subplot(211)
-    plt.xlabel("Timestamp")
-    plt.ylabel("Requests per VM")
-    plt.plot(req_mean.T[0], req_mean.T[1])
-    plt.subplot(212)
-    plt.xlabel("Timestamp")
+    dp = create_data_points()
+
+    plt.xlabel("Requests")
     plt.ylabel("CPU %")
-    plt.plot(cpu_mean.T[0], cpu_mean.T[1])
+    plt.scatter(dp.T[0], dp.T[1])
     plt.show()
 
-plot_measurements()
+
+def clustering_2():
+
+    dp = create_data_points()
+    kmeans = cluster.KMeans(n_clusters=2).fit_predict(dp)
+    class1 = list()
+    class2 = list()
+    for i in range(0, len(kmeans)):
+        if kmeans[i] == 0:
+            class1.append(dp[i])
+        if kmeans[i] == 1:
+            class2.append(dp[i])
+    class1 = np.array(class1)
+    class2 = np.array(class2)
+
+    plt.scatter(class1.T[0], class1.T[1], color="b")
+    plt.scatter(class2.T[0], class2.T[1], color="r")
+    plt.show()
+
+def clustering_3():
+
+    dp = create_data_points()
+    kmeans = cluster.KMeans(n_clusters=3).fit_predict(dp)
+    class1 = list()
+    class2 = list()
+    class3 = list()
+    for i in range(0, len(kmeans)):
+        if kmeans[i] == 0:
+            class1.append(dp[i])
+        if kmeans[i] == 1:
+            class2.append(dp[i])
+        if kmeans[i] == 2:
+            class3.append(dp[i])
+    class1 = np.array(class1)
+    class2 = np.array(class2)
+    class3 = np.array(class3)
+
+    plt.scatter(class1.T[0], class1.T[1], color="b")
+    plt.scatter(class2.T[0], class2.T[1], color="g")
+    plt.scatter(class3.T[0], class3.T[1], color="r")
+    plt.show()
+
+def clustering_4():
+
+    dp = create_data_points()
+    kmeans = cluster.KMeans(n_clusters=4).fit_predict(dp)
+    class1 = list()
+    class2 = list()
+    class3 = list()
+    class4 = list()
+    for i in range(0, len(kmeans)):
+        if kmeans[i] == 0:
+            class1.append(dp[i])
+        if kmeans[i] == 1:
+            class2.append(dp[i])
+        if kmeans[i] == 2:
+            class3.append(dp[i])
+        if kmeans[i] == 3:
+            class4.append(dp[i])
+    class1 = np.array(class1)
+    class2 = np.array(class2)
+    class3 = np.array(class3)
+    class4 = np.array(class4)
+
+    plt.scatter(class1.T[0], class1.T[1], color="b")
+    plt.scatter(class2.T[0], class2.T[1], color="g")
+    plt.scatter(class3.T[0], class3.T[1], color="m")
+    plt.scatter(class4.T[0], class4.T[1], color="r")
+    plt.show()
+
+clustering_2()
+clustering_3()
+#clustering_4()
+
