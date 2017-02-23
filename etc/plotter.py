@@ -27,12 +27,10 @@ def plot_measurements():
 
 def plot_clusters2d(clusters):
     for i in range(0, len(clusters)):
-        pprint(clusters[i])
         plt.scatter(clusters[i].T[0], clusters[i].T[1], color=colors[i])
     plt.show()
 
 def plot_clusters3d(clusters):
-    pprint(clusters)
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     for i in range(0, len(clusters)):

@@ -27,7 +27,9 @@ def run_simulation():
 
     # -> For each time step compute the score of the system
 
-    # Combine the whole algorithm -> classification + regression
+    # Combine the whole algorithm -> classification? + regression
+
+    # Reinforcement Learning ?
 
     # Train on part of the data
 
