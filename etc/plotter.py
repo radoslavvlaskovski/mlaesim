@@ -36,3 +36,11 @@ def plot_clusters3d(clusters):
     for i in range(0, len(clusters)):
         ax.scatter(clusters[i].T[0], clusters[i].T[1], clusters[i].T[2], color=colors[i])
     plt.show()
+
+
+def plot_ridge(X, Y_real, Y_result):
+
+    plt.plot(X, Y_real, "b")
+    plt.plot(X, Y_result, "r")
+
+    plt.show()
