@@ -1,5 +1,7 @@
 from etc import reader
-from models import clustering, regression
+from resource_prediction import regression
+from system_analysis import clustering
+
 
 def algorithm_simulation():
 

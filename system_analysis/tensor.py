@@ -21,7 +21,7 @@ def main():
 
     # Build 3 layer DNN with 10, 20, 10 units respectively.
     classifier = tf.contrib.learn.DNNClassifier(feature_columns=feature_columns,
-                                                hidden_units=[10, 20, 10],
+                                                hidden_units=[2],
                                                 n_classes=3,
                                                 model_dir="/tmp/iris_model")
 
