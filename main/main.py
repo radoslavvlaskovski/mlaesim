@@ -1,20 +1,7 @@
 from etc import reader
 from resource_prediction import regression
 from system_analysis import clustering
-
-
-def algorithm_simulation():
-
-    # Divide data in testing data and train
-
-    # Use train data for classification
-
-    # Predict next req number
-
-    # Create policy
-
-
-    return
+from resource_prediction import timeseries_predictor
 
 def cluster_test():
 
@@ -28,6 +15,14 @@ def ridge_test():
     regression.polynomial()
     return
 
+def timeseries_test():
+
+    timeseries_predictor.requests_predictions()
+
+
+def run_test():
+
+    return
 
 def run_simulation():
 
@@ -46,6 +41,5 @@ def run_simulation():
 
     return
 
-cluster_test()
-ridge_test()
 
+run_test()

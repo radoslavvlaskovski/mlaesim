@@ -150,11 +150,12 @@ def create_3d_data_points_no_requests():
 def create_regression_dp():
 
     data_points = read_cpu_mean()
+    print(len(data_points))
     data_points["timestamp"] -= np.ones(len(data_points)) * 1456160000
-    dp = np.delete(np.array(data_points), (0), axis=1)
+    dp = np.delete(np.array(data_points), 0, axis=1)
     dp = dp.astype(int)
 
     for i in range(0, len(data_points)):
         dp[i][1] = dp[i][1] * dp[i][2]
-
+    dp = np.delete(dp, 2, axis=1)
     return np.array(dp)

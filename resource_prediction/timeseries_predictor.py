@@ -2,29 +2,22 @@ import pandas
 from pprint import *
 import numpy as np
 import matplotlib.pyplot as plt
-import sklearn.cluster as cluster
-from mpl_toolkits.mplot3d import Axes3D
 import statsmodels.api as sm
+from etc import reader
 
-def requests_predictions(data_points):
+def requests_predictions():
 
-    start = "1970-01-01 01:01:00"
-    end = "1970-01-01 08:01:00"
+    data_points = reader.create_regression_dp()
+    start = 0
+    end = 5094
     p = 2
     d = 0
     q = 12
 
-    print(data_points.index)
-    data_points.index = pandas.to_datetime(req.index, unit="m")
-    del data_points["timestamp"]
-    del data_points["#key"]
-    data_points["value"] = data_points["value"].astype(float)
-    pprint(data_points)
+    arma20 = sm.tsa.ARIMA(data_points.astype(float), (p, d, q)).fit()
 
-    arma20 = sm.tsa.ARIMA(data_points, (p, d, q)).fit()
-
-    plt.plot(arma20.predict(start=start, end=end, dynamic=True), color="r")
-    plt.plot(data_points, color="b")
+    #plt.plot(arma20.predict(start=start, end=end, dynamic=True), color="r")
+    plt.plot(data_points.T[0], data_points.T[1], color="b")
     plt.show()
 
     return
@@ -42,3 +35,5 @@ def plot_rel_cpu_req():
     plt.plot(req_mean["timestamp"][2:], data_points.T[1], color="r")
     plt.show()
 '''
+
+
