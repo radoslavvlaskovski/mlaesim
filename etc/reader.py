@@ -136,7 +136,7 @@ def create_data_points_no_requests():
     cpu_mean = read_cpu_mean()
     data_points = list()
     for i in range(1, len(cpu_mean) - 1):
-        data_points.append([cpu_mean["value"], cpu_mean["count"]])
+        data_points.append([cpu_mean["value"][i], cpu_mean["count"][i]])
     return np.array(data_points)
 
 def create_3d_data_points_no_requests():

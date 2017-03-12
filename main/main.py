@@ -5,9 +5,9 @@ from resource_prediction import timeseries_predictor
 
 def cluster_test():
 
-    dp = reader.create_3d_data_points_no_requests()
-    clustering.clustering(dp, 2)
+    dp = reader.create_data_points_no_requests()
     clustering.clustering(dp, 3)
+    #clustering.clustering(dp, 5)
 
 
 def ridge_test():
@@ -21,7 +21,7 @@ def timeseries_test():
 
 
 def run_test():
-
+    cluster_test()
     return
 
 def run_simulation():
