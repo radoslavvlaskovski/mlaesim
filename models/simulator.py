@@ -10,14 +10,15 @@ def classify(current_data):
     thresholds = clustering.clustering(current_data, 3)
     return thresholds
 
-def predictor():
+def predictor(regression_data, current_step, steps_advance):
 
-    return
+    return regression_data[current_step + steps_advance][1]
 
 def run(update_freq = 0, steps_advance = 0, starting_step = 0):
 
     cluster_data = reader.create_data_points_no_requests()
     current_data = cluster_data[:starting_step]
+    regression_data = reader.create_regression_dp()
 
     current_step = starting_step
     current_vm_number = cluster_data[starting_step][1]
@@ -53,16 +54,17 @@ def run(update_freq = 0, steps_advance = 0, starting_step = 0):
             thresholds = classify(current_data)
 
         # Predict
-
-        # Make a decision
-        decision = clustering.make_decision(thresholds, current_vm_number, current_mean_cpu_usage)
-        # SCALE IN
-        if decision == 0 and current_vm_number > 1:
-            current_vm_number -= 1
-        #SCALE OUT
-        if decision == 1 and vm_start_in_progress == False:
-            vm_start_in_progress = True
-            next_vm_start_time = current_step + vm_start_latency
+        if last_step > current_step + steps_advance:
+            prediction = predictor(regression_data, current_step, steps_advance) / current_vm_number
+            # Make a decision
+            decision = clustering.make_decision(thresholds, current_vm_number, prediction)
+            # SCALE IN
+            if decision == 0 and current_vm_number > 1:
+                current_vm_number -= 1
+            # SCALE OUT
+            if decision == 1 and vm_start_in_progress == False:
+                vm_start_in_progress = True
+                next_vm_start_time = current_step + vm_start_latency
 
         # Update data go to next step
         current_data = np.append(current_data, [[current_mean_cpu_usage, current_vm_number]], axis=0)
@@ -95,4 +97,4 @@ def compare(cluster_data, output_data, starting_step):
     print(" COUNT SCALING REAL: " + str(real_scaling_procedures))
     print(" COUNT SCALING SIM: " + str(sim_scaling_procedures))
 
-run(starting_step=1000)
+run(starting_step=1000, steps_advance=10)
