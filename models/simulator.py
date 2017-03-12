@@ -55,7 +55,10 @@ def run(update_freq = 0, steps_advance = 0, starting_step = 0):
 
         # Predict
         if last_step > current_step + steps_advance:
+            # Make a prediction
             prediction = predictor(regression_data, current_step, steps_advance) / current_vm_number
+            # Adding some noise. Delete when real prediction
+            prediction += np.random.randint(low=-5, high=5)
             # Make a decision
             decision = clustering.make_decision(thresholds, current_vm_number, prediction)
             # SCALE IN

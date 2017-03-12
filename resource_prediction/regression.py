@@ -1,6 +1,7 @@
 from pprint import pprint
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.svm import SVR
 from etc import plotter
 import numpy as np
 from etc import reader
@@ -45,6 +46,25 @@ def polynomial(alpha = 10000, degree = 2):
     Y_result = model.predict(X)
 
     plotter.plot_ridge(X, Y, Y_result)
+    return
+
+def svr():
+    dp = reader.create_regression_dp()
+    X = dp.T[0]
+    X = np.reshape(X, (len(X), 1))
+    Y = dp.T[1]
+
+    X_train = X[:2500]
+    Y_train = Y[:2500]
+
+    X_test = X[2500:]
+
+    clf = SVR(C=1.0, epsilon=0.2)
+    clf.fit(X_train, Y_train)
+    Y_result = clf.predict(X)
+
+    plotter.plot_ridge(X, Y, Y_result)
+
     return
 
 
