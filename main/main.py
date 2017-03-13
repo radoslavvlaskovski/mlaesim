@@ -6,8 +6,8 @@ from resource_prediction import timeseries_predictor
 def cluster_test():
 
     dp = reader.create_data_points_no_requests()
-    clustering.clustering(dp, 3)
-    clustering.clustering(dp, 5)
+    clustering.clustering(dp, 3, graph=True)
+    clustering.clustering(dp, 5, graph=True)
 
 
 def regression_test():

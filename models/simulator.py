@@ -2,6 +2,7 @@ from etc import reader
 from system_analysis import clustering
 from pprint import pprint
 import numpy as np
+from matplotlib import pyplot as plt
 
 vm_start_latency = 7
 reclassify_latency = 20
@@ -99,5 +100,17 @@ def compare(cluster_data, output_data, starting_step):
     print(" AVG VM SIM: " + str(sim_avg_vms))
     print(" COUNT SCALING REAL: " + str(real_scaling_procedures))
     print(" COUNT SCALING SIM: " + str(sim_scaling_procedures))
+
+
+    plt.plot(np.arange(0, len(output_data)), output_data.T[0], color="b")
+    plt.plot(np.arange(0, len(cluster_data[starting_step:])), cluster_data[starting_step:].T[0], color="r")
+    plt.title("CPU AVERAGE, Simulation color: blue")
+    #plt.show()
+
+    plt.plot(np.arange(0, len(output_data)), output_data.T[1], color="b")
+    plt.plot(np.arange(0, len(cluster_data[starting_step:])), cluster_data[starting_step:].T[1], color="r")
+    plt.title("VM NUMBER, Simulation color: blue")
+    #plt.show()
+
 
 run(starting_step=1000, steps_advance=10)

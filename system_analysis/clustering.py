@@ -3,7 +3,7 @@ import sklearn.cluster as cluster
 from etc import plotter
 from pprint import pprint
 
-def clustering(data_points, cluster_number):
+def clustering(data_points, cluster_number, graph = False):
     class_numbers = np.arange(0, cluster_number)
     clusters = list()
     for i in range(0, cluster_number):
@@ -18,7 +18,8 @@ def clustering(data_points, cluster_number):
     for i in range(0, len(clusters)):
         clusters[i] = np.array(clusters[i])
 
-    plot(clusters)
+    if graph:
+        plot(clusters)
 
     return create_thresholds(clusters, cluster_number)
 
