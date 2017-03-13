@@ -40,6 +40,8 @@ def run(update_freq = 0, steps_advance = 0, starting_step = 0):
         # Run what happens at a single time step
         # compute current mean cpu
         current_mean_cpu_usage = (cluster_data[current_step][0] * cluster_data[current_step][1]) / current_vm_number
+        if current_mean_cpu_usage > 100 :
+            current_mean_cpu_usage = 100
 
         # Check if new VM started
         if vm_start_in_progress:
@@ -105,12 +107,12 @@ def compare(cluster_data, output_data, starting_step):
     plt.plot(np.arange(0, len(output_data)), output_data.T[0], color="b")
     plt.plot(np.arange(0, len(cluster_data[starting_step:])), cluster_data[starting_step:].T[0], color="r")
     plt.title("CPU AVERAGE, Simulation color: blue")
-    #plt.show()
+    plt.show()
 
     plt.plot(np.arange(0, len(output_data)), output_data.T[1], color="b")
     plt.plot(np.arange(0, len(cluster_data[starting_step:])), cluster_data[starting_step:].T[1], color="r")
     plt.title("VM NUMBER, Simulation color: blue")
-    #plt.show()
+    plt.show()
 
 
 run(starting_step=1000, steps_advance=10)
