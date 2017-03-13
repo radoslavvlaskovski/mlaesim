@@ -28,6 +28,7 @@ def plot_measurements():
 def plot_clusters2d(clusters):
     for i in range(0, len(clusters)):
         plt.scatter(clusters[i].T[0], clusters[i].T[1], color=colors[i])
+    plt.title("Clustering with Number of clusters " + str(len(clusters)))
     plt.show()
 
 def plot_clusters3d(clusters):
@@ -38,9 +39,9 @@ def plot_clusters3d(clusters):
     plt.show()
 
 
-def plot_ridge(X, Y_real, Y_result):
+def plot_regression(X, Y_real, Y_result):
 
     plt.plot(X, Y_real, "b")
     plt.plot(X, Y_result, "r")
-
+    plt.title("1D Regression")
     plt.show()

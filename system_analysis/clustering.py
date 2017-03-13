@@ -18,6 +18,8 @@ def clustering(data_points, cluster_number):
     for i in range(0, len(clusters)):
         clusters[i] = np.array(clusters[i])
 
+    plot(clusters)
+
     return create_thresholds(clusters, cluster_number)
 
 def create_thresholds(clusters, cluster_number, max_vm_number=8):

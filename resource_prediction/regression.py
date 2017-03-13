@@ -25,7 +25,7 @@ def ridge(alpha=10):
     model = Ridge(alpha=alpha).fit(X_train, Y_train)
     Y_result = model.predict(X)
 
-    plotter.plot_ridge(X, Y, Y_result)
+    plotter.plot_regression(X, Y, Y_result)
     return
 
 def polynomial(alpha = 10000, degree = 2):
@@ -45,7 +45,7 @@ def polynomial(alpha = 10000, degree = 2):
     model = Ridge(alpha=alpha).fit(X_train, Y_train)
     Y_result = model.predict(X)
 
-    plotter.plot_ridge(X, Y, Y_result)
+    plotter.plot_regression(X, Y, Y_result)
     return
 
 def svr():
@@ -63,7 +63,7 @@ def svr():
     clf.fit(X_train, Y_train)
     Y_result = clf.predict(X)
 
-    plotter.plot_ridge(X, Y, Y_result)
+    plotter.plot_regression(X, Y, Y_result)
 
     return
 
