@@ -11,11 +11,15 @@ def classify(current_data):
     thresholds = clustering.clustering(current_data, 3)
     return thresholds
 
-def predictor(regression_data, current_step, steps_advance):
+def predictor_one_value(regression_data, current_step, steps_advance):
 
     return regression_data[current_step + steps_advance][1]
 
-def run(update_freq = 0, steps_advance = 0, starting_step = 0):
+def predictor_many(regression_data, current_step):
+
+    return regression_data.T[1][current_step:current_step + 100]
+
+def run(update_freq = 0, steps_advance = 0, starting_step = 0, prediction_type="one"):
 
     cluster_data = reader.create_data_points_no_requests()
     current_data = cluster_data[:starting_step]
@@ -59,16 +63,18 @@ def run(update_freq = 0, steps_advance = 0, starting_step = 0):
         # Predict
         if last_step > current_step + steps_advance:
             # Make a prediction
-            prediction = predictor(regression_data, current_step, steps_advance) / current_vm_number
-            # Adding some noise. Delete when real prediction
-            prediction += np.random.randint(low=-5, high=5)
-            # Make a decision
-            decision = clustering.make_decision(thresholds, current_vm_number, prediction)
+            if prediction_type == "one":
+                prediction = predictor_one_value(regression_data, current_step, steps_advance) / current_vm_number
+                prediction += np.random.randint(low=-5, high=5)
+                decision = clustering.make_decision_onevalue(thresholds, current_vm_number, prediction)
+            else:
+                predictions = predictor_many(regression_data, current_step)
+                decision = clustering.make_decision_many(thresholds, current_vm_number, predictions)
             # SCALE IN
             if decision == 0 and current_vm_number > 1:
                 current_vm_number -= 1
             # SCALE OUT
-            if decision == 1 and vm_start_in_progress == False:
+            if decision == 2 and vm_start_in_progress == False:
                 vm_start_in_progress = True
                 next_vm_start_time = current_step + vm_start_latency
 
@@ -115,4 +121,4 @@ def compare(cluster_data, output_data, starting_step):
     plt.show()
 
 
-run(starting_step=1000, steps_advance=10)
+run(starting_step=1000, steps_advance=20)

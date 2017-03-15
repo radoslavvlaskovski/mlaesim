@@ -59,7 +59,7 @@ def create_thresholds(clusters, cluster_number, max_vm_number=8):
 
     return thresholds_combined
 
-def make_decision(thresholds, vm_number, cpu_usage):
+def make_decision_onevalue(thresholds, vm_number, cpu_usage):
 
     if vm_number >= len(thresholds):
         vm_number = len(thresholds)
@@ -68,6 +68,31 @@ def make_decision(thresholds, vm_number, cpu_usage):
         return 0
     elif cpu_usage > relevant_thresholds[2]:
         return 2
+    else:
+        return 1
+
+def make_decision_many(thresholds, vm_number, usage):
+
+    for i in range(0, len(usage)):
+        usage[i] = usage[i] / vm_number
+
+    if vm_number >= len(thresholds):
+        vm_number = len(thresholds)
+    relevant_thresholds = thresholds[vm_number - 1]
+    high = relevant_thresholds[2]
+    low = relevant_thresholds[1]
+
+    over = 0
+    under = 0
+    for cpu in usage:
+        if cpu >= high:
+            over += cpu - high
+        if cpu <= low:
+            under += low - cpu
+    if over > under and over > 50:
+        return 2
+    elif under > over and under > 50:
+        return 0
     else:
         return 1
 
