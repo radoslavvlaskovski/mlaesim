@@ -84,7 +84,8 @@ def make_decision_many(thresholds, vm_number, usage):
 
     over = 0
     under = 0
-    for cpu in usage:
+    for i in range(0, len(usage)):
+        cpu = usage[i] / vm_number
         if cpu >= high:
             over += cpu - high
         if cpu <= low:
