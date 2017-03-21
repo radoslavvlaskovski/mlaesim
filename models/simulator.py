@@ -123,4 +123,4 @@ def compare(cluster_data, output_data, starting_step):
     plt.show()
 
 
-run(starting_step=1000, steps_advance=20, prediction_type="many", prediction_latency=30)
+run(starting_step=1000, steps_advance=20, prediction_type="one", prediction_latency=25)

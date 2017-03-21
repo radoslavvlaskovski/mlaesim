@@ -26,7 +26,7 @@ def run_test():
     return
 
 
-cluster_test()
-regression_test()
+#cluster_test()
+#regression_test()
 timeseries_test()
 
