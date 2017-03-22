@@ -97,6 +97,19 @@ def make_decision_many(thresholds, vm_number, usage):
     else:
         return 1
 
+def make_decision_mean(thresholds, vm_number, cpu_usage):
+
+    mean_value = np.mean(cpu_usage) / vm_number
+    if vm_number >= len(thresholds):
+        vm_number = len(thresholds)
+    relevant_thresholds = thresholds[vm_number - 1]
+    if mean_value < relevant_thresholds[1]:
+        return 0
+    elif mean_value > relevant_thresholds[2]:
+        return 2
+    else:
+        return 1
+
 def plot(clusters):
     if clusters[0].shape[1] == 2:
         plotter.plot_clusters2d(clusters)

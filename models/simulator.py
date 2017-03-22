@@ -7,20 +7,25 @@ from matplotlib import pyplot as plt
 vm_start_latency = 7
 reclassify_latency = 20
 
+
 def classify(current_data):
     thresholds = clustering.clustering(current_data, 3)
     return thresholds
 
-def predictor_one_value(regression_data, current_step, steps_advance):
 
+def predictor_one_value(regression_data, current_step, steps_advance):
     return regression_data[current_step + steps_advance][1]
 
-def predictor_many(regression_data, current_step):
 
+def predictor_many(regression_data, current_step):
     return regression_data.T[1][current_step:current_step + 100]
 
-def run(update_freq = 0, steps_advance = 0, starting_step = 0, prediction_type="one", prediction_latency=20):
 
+def predictor_mean(regression_data, current_step, steps_advance):
+    return regression_data.T[1][current_step:current_step + steps_advance]
+
+
+def run(update_freq=0, steps_advance=0, starting_step=0, prediction_type="one", prediction_latency=20):
     cluster_data = reader.create_data_points_no_requests()
     current_data = cluster_data[:starting_step]
     regression_data = reader.create_regression_dp()
@@ -40,18 +45,18 @@ def run(update_freq = 0, steps_advance = 0, starting_step = 0, prediction_type="
     output_data = list()
     next_prediction = current_step
 
-    while(current_step <= last_step):
+    while (current_step <= last_step):
 
         # Run what happens at a single time step
         # compute current mean cpu
         current_mean_cpu_usage = (cluster_data[current_step][0] * cluster_data[current_step][1]) / current_vm_number
-        if current_mean_cpu_usage > 100 :
+        if current_mean_cpu_usage > 100:
             current_mean_cpu_usage = 100
 
         # Check if new VM started
         if vm_start_in_progress:
             if next_vm_start_time == current_step:
-                current_vm_number +=1
+                current_vm_number += 1
                 vm_start_in_progress = False
         # If needed reclassify data
         if reclassify_countdown > 0:
@@ -69,9 +74,12 @@ def run(update_freq = 0, steps_advance = 0, starting_step = 0, prediction_type="
                     prediction = predictor_one_value(regression_data, current_step, steps_advance) / current_vm_number
                     prediction += np.random.randint(low=-5, high=5)
                     decision = clustering.make_decision_onevalue(thresholds, current_vm_number, prediction)
-                else:
+                elif prediction_type == "many":
                     predictions = predictor_many(regression_data, current_step)
                     decision = clustering.make_decision_many(thresholds, current_vm_number, predictions)
+                elif prediction_type == "mean":
+                    predictions = predictor_mean(regression_data, current_step, steps_advance)
+                    decision = clustering.make_decision_mean(thresholds, current_vm_number, predictions)
                 # SCALE IN
                 if decision == 0 and current_vm_number > 1:
                     current_vm_number -= 1
@@ -87,6 +95,7 @@ def run(update_freq = 0, steps_advance = 0, starting_step = 0, prediction_type="
 
     compare(cluster_data, output_data, starting_step)
 
+
 def compare(cluster_data, output_data, starting_step):
     output_data = np.array(output_data)
     sim_avg_cpu = np.mean(output_data.T[0])
@@ -96,13 +105,12 @@ def compare(cluster_data, output_data, starting_step):
 
     sim_scaling_procedures = 0
     for i in range(0, len(output_data) - 1):
-        if output_data[i][1] != output_data[i+1][1]:
+        if output_data[i][1] != output_data[i + 1][1]:
             sim_scaling_procedures += 1
     real_scaling_procedures = 0
     for i in range(0, len(cluster_data) - 1):
         if cluster_data[i][1] != cluster_data[i + 1][1]:
             real_scaling_procedures += 1
-
 
     print(" AVG CPU REAL: " + str(avg_cpu))
     print(" AVG CPU SIM: " + str(sim_avg_cpu))
@@ -110,7 +118,6 @@ def compare(cluster_data, output_data, starting_step):
     print(" AVG VM SIM: " + str(sim_avg_vms))
     print(" COUNT SCALING REAL: " + str(real_scaling_procedures))
     print(" COUNT SCALING SIM: " + str(sim_scaling_procedures))
-
 
     plt.plot(np.arange(0, len(output_data)), output_data.T[0], color="b")
     plt.plot(np.arange(0, len(cluster_data[starting_step:])), cluster_data[starting_step:].T[0], color="r")
@@ -123,4 +130,4 @@ def compare(cluster_data, output_data, starting_step):
     plt.show()
 
 
-run(starting_step=1000, steps_advance=20, prediction_type="one", prediction_latency=25)
+run(starting_step=1000, steps_advance=20, prediction_type="mean", prediction_latency=10)
